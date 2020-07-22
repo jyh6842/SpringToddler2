@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+<!-- 	여기는 루트Context 이기 때문에 Service가 있으면 에러남 Service는 먼저 로드될 필요가 없기 때문에  -->
+<!-- 	do 확장자가 들어오기 전부터 만들어져 있음 -->
+	<context:component-scan base-package="kr.or.ddit">
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Service"/> <!-- @Service 사용하겠습니다. -->
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Repository"/> <!-- @Repository 사용하겠습니다. -->
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Component"/> <!-- @Component 사용하겠습니다. -->
+<!-- 		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Component"/> @Component 사용하지 않겠습니다. -->
+	</context:component-scan>
+	
+</beans>

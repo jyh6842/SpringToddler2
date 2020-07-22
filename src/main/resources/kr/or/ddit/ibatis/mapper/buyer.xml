@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap   
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="buyer">
+<typeAlias alias="buyerVO" type="kr.or.ddit.vo.BuyerVO"/>
+	
+	<sql id="searchCondition">
+		<dynamic prepend="AND">
+			<isNotEmpty property="search_keyword" open="(" close=")">
+				<isEqual property="search_keycode" compareValue="ALL">
+					BUYER_ID LIKE '%' || #search_keyword# || '%'
+					OR BUYER_NAME LIKE '%' || #search_keyword# || '%'
+					OR BUYER_CHARGER LIKE '%' || #search_keyword# || '%'
+				</isEqual>
+				<isEqual property="search_keycode" compareValue="BUYERID">
+					BUYER_ID LIKE '%' || #search_keyword# || '%'
+				</isEqual>
+				<isEqual property="search_keycode" compareValue="BUYERNAME">
+					BUYER_NAME LIKE '%' || #search_keyword# || '%'
+				</isEqual>
+				<isEqual property="search_keycode" compareValue="BUYERCHARGER">
+					BUYER_CHARGER LIKE '%' || #search_keyword# || '%'
+				</isEqual>
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+	<select id="selectBuyer" parameterClass="map" resultClass="buyerVO">
+		SELECT *
+		  FROM buyer
+		 WHERE buyer_name LIKE '%' || #buyer_name# || '%'
+	</select>
+	
+	<select id="buyerList" resultClass="java.util.HashMap" parameterClass="map"> <!-- java.util.HashMap -->
+	SELECT B.*
+		FROM (SELECT ROWNUM RNUM, A.*
+			FROM (SELECT *
+				 FROM LPROD L INNER JOIN BUYER B
+				 	ON(L.LPROD_GU = B.BUYER_LGU)
+				 			WHERE BUYER_DELETE = 'n'
+				 	<include refid="searchCondition"/>)A)B
+	<![CDATA[				 	
+	WHERE B.RNUM <= #startCount#
+		AND B.RNUM >= #endCount#
+	]]>
+	ORDER BY B.RNUM desc					 	
+	</select>
+	
+	<select id="buyerInfo" parameterClass="map" resultClass="buyerVO">
+		SELECT *
+		 FROM BUYER
+		 	WHERE BUYER_ID = #buyer_id#
+	</select>
+	
+	<update id="buyerUpdate" parameterClass="buyerVO">
+		UPDATE BUYER
+			SET 
+				BUYER_NAME     = #buyer_name#,
+				BUYER_CHARGER  = #buyer_charger#,
+				BUYER_BANK     = #buyer_bank#,
+				BUYER_ADD1     = #buyer_add1#,
+				BUYER_ADD2     = #buyer_add2#,
+				BUYER_COMTEL   = #buyer_comtel#,
+				BUYER_FAX      = #buyer_fax#,
+				BUYER_MAIL	   = #buyer_mail#
+			WHERE
+				BUYER_ID       = #buyer_id#
+	</update>
+	
+	<insert id="buyerInsert" parameterClass="buyerVO">
+		INSERT 
+			INTO BUYER
+				(
+					BUYER_ID,		
+					BUYER_NAME,
+					BUYER_CHARGER,
+					BUYER_BANK,
+					BUYER_ADD1,
+					BUYER_ADD2,
+					BUYER_LGU,
+					BUYER_COMTEL,
+					BUYER_FAX,
+					BUYER_MAIL)
+			VALUES
+			    (
+					#buyer_id#,		
+					#buyer_name#,   
+					#buyer_charger#,
+					#buyer_bank#,   
+					#buyer_add1#,   
+					#buyer_add2#,
+					#buyer_lgu#,   
+					#buyer_comtel#, 
+					#buyer_fax#,    
+					#buyer_mail#)
+			
+	</insert>
+	
+	<update id="buyerDelete" parameterClass="map">
+		UPDATE buyer
+			SET buyer_DELETE = 'y'
+		 WHERE buyer_ID = #buyer_id#
+	</update>
+	
+	<select id="buyerRecommend" resultClass="java.util.HashMap">
+		SELECT DISTINCT MAX(BUYER_ID) OVER(PARTITION BY BUYER_LGU) BUYER_ID_MAX, BUYER_LGU 
+		 FROM LPROD L, BUYER B
+		 WHERE L.LPROD_GU = B.BUYER_LGU
+		ORDER BY BUYER_ID_MAX
+	</select>
+	
+	<select id="totalCount" parameterClass="map" resultClass="String">
+		SELECT COUNT(BUYER_ID)
+		 FROM buyer
+		  WHERE buyer_delete = 'n'
+			<include refid="searchCondition"/>
+	</select>
+		
+</sqlMap>
+

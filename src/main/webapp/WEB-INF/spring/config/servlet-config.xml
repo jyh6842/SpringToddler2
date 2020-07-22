@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+	
+	<!-- 
+		어노테이션 기반 자동 빈 선언 및 빈 인스턴스 활용
+		context:component-scan - base package 속성에 선언된 해당 패키지 하위 전체 패키지 내 모든 클래스들을 대상으로 빈 등록
+								  빈 등록 조건 : 클래스 상단에 어노테이션( @Controller, @Service, @Component )
+								  			선언시 자동으로 빈 등록 후 활용
+								  			@Controller - 컨트롤러 클래스(커맨드 컨트롤러) ( 클라이언트의 요청을 처리하는 애)
+								  			@Service - Service 레이어 내 클래스
+								  			@Repository - DAO 레이어 내 클래스
+								  			@Component - 기타 클래스	
+	 -->
+	<context:component-scan base-package="kr.or.ddit">
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/> <!-- @Controller 사용하겠습니다. -->
+<!-- 		이 친구만 여기 있는 이유는 실행할때 Controller 은 항상 필요하지 않다. -->
+<!-- 			do 확장자가 들어오면 만들어짐 -->
+	</context:component-scan>
+	
+</beans>

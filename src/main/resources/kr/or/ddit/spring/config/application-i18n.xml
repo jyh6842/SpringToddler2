@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+<!-- 
+	스프링 프레임웤 다국어 서비스
+		1. 클라이언트 서버 대상 요청시 요청 헤더 데이타 중 Accept-Language 기초로
+			다국어 서비스를 제공. (한국 Accept-Language - ko-kr)
+		2. AcceptHeaderLocaleResolver 자원이 요청 헤더 데이터를 기초로
+			준비된 프로퍼티스 파일 중 클라이언트 접속 국가 언어코드의 프로퍼티 파일을 특정한다.
+		3. 다국어 시비스를 위해 준비되지 않은 클라이언트 접속 국가는 언어코드가 생략된 프로퍼티스 파일을 활용해 서비스 제공
+		
+ -->
+ 
+	 <bean id="localeResolver" class="org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver"></bean>
+	
+	 <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource" 
+	 	p:basename="kr/or/ddit/i18n/config/message"
+	 	p:defaultEncoding="UTF-8"
+	 	>
+	 </bean>
+ 
+ 	<bean id="messageAccessor" class="org.springframework.context.support.MessageSourceAccessor"
+ 		c:messageSource-ref="messageSource">
+ 	</bean>
+
+</beans>

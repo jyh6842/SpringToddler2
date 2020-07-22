@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:jee="http://www.springframework.org/schema/jee"
+	xsi:schemaLocation="http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd">
+		
+	<!-- 
+		프로퍼티스 파일 접근(SqlMapConfig.properties) 2가지 방법
+			context:property-placeholder - 해당 빈이 선언된 설정파일내에서만 프로퍼티스 파일의 데이타가 활용 가능
+											EL 표기법을 통해 프로퍼티스 파일의 키에 접근(${driver})
+			util:properties - 애플리케이션 전역에서 프로퍼티스 파일의 데이터가 활용 가능
+								#{util:properties 빈 등록시의 id 또는 name값['프로퍼티스 파일 내 키']}
+								ex) #{connectionInfo['driver']}
+	 -->
+	 <context:property-placeholder location="classpath:kr/or/ddit/ibatis/config/SqlMapConfig.properties"
+	 								file-encoding="UTF-8"/>
+<!-- 	 <util:properties id="connectionInfo" location="classpath:kr/or/ddit/ibatis/config/SqlMapConfig.properties"></util:properties> -->
+
+	<!-- 
+		스프링 프레임웤 내 커넥션 취득을 위한 가용한 DataSource
+			1. SimpleDriverSource - 테스트용
+			2. DriverManagerDataSource - DBCP, JNDI 배제되고(사용 불가능), Simple 타입의 커넥션 제공 환경
+			3. BasicDataSource - DBCP, JNDI, Simple 타입의 커넥션 제공 환경(commons-pool-?.?.?.jar 활용)
+	 -->
+	 
+<!-- 	 1. SimpleDriverSource - 테스트용 -->
+<!--    <bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource" -->
+<!--          p:driver="${driver}" p:url="${url}" -->
+<!--          p:username="${username}" p:password="${password}"> -->
+<!--    </bean> -->
+
+<!--    <bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource" -->
+<!--          p:driverClassName="${connectionInfo['driver']}" -->
+<!--          p:url="#{connectionInfo['url']}"  -->
+<!--          p:username="#{connectionInfo['username']}" -->
+<!--          p:password="#{connectionInfo['password']}"> -->
+<!--    </bean> -->
+
+<!--       <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" -->
+<!--             p:driverClassName="#{connectionInfo['driver']}" -->
+<!--             p:url="#{connectionInfo['url']}" -->
+<!--             p:username="#{connectionInfo['username]}" -->
+<!--             p:password="#{connectionInfo['password']}" -->
+<!--             p:initialSize="10" -->
+<!--             p:maxActive="6" -->
+<!--             p:maxWait="-1" -->
+<!--             p:removeAbandoned="true" -->
+<!--             p:removeAbandonedTimeout="5000" -->
+<!--             p:maxIdle="6" -->
+<!--             p:minIdle="3"> -->
+<!--       </bean> -->
+
+<!-- context.xml 여기서 가져옴 -->
+      
+      
+ <jee:jndi-lookup jndi-name="jdbc/ddit" id="dataSource"></jee:jndi-lookup>
+   
+   <!-- 
+      class SqlMapClientFactoryBean{
+         private DataSource dataSource;
+         
+         public void setDataSource(DataSource dataSource){
+            this.dataSource = dataSource;
+         }
+         
+      }
+    -->
+   
+   <bean id="sqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean"
+      p:dataSource-ref="dataSource"
+      p:configLocation="classpath:kr/or/ddit/ibatis/config/SqlMapConfig.xml"
+      p:useTransactionAwareDataSource="true"
+      p:transactionConfigClass="com.ibatis.sqlmap.engine.transaction.external.ExternalTransactionConfig"
+      >
+      <property name="transactionConfigProperties">
+      	<props>
+      		<prop key="DefaultAutoCommit">false</prop>
+      		<prop key="SetAutoCommitAllowed">true</prop>
+      	</props>
+      </property>
+   </bean>
+   
+   <bean id="transactionMGR" class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+   		p:dataSource-ref="dataSource"
+   >
+   	
+   </bean>
+
+
+
+	
+
+
+
+</beans>

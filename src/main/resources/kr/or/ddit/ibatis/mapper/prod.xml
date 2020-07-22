@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap   
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="prod">
+<typeAlias alias="prodVO" type="kr.or.ddit.vo.ProdVO"/>
+
+<!-- alter table prod add(prod_delete char(1) default 'n'); -->
+
+<!-- update prod set prod_delete='n'; -->
+
+	<sql id="selectAll">
+		SELECT * 
+		 FROM PROD, BUYER 
+		  WHERE PROD.PROD_BUYER = BUYER.BUYER_ID 
+		   
+		   AND PROD_DELETE = 'n'
+		
+	</sql>
+	
+	<sql id="searchCondition">
+		
+		<dynamic prepend="AND">
+			<isNotEmpty property="search_keyword" open="(" close=")">
+				<isEqual property="search_keycode" compareValue="ALL">
+				    PROD.PROD_LGU LIKE '%' || #search_keyword# || '%'
+					OR PROD.PROD_NAME LIKE '%' || #search_keyword# || '%'
+					OR BUYER.BUYER_NAME LIKE '%' || #search_keyword# || '%'
+				</isEqual>
+				<isEqual property="search_keycode" compareValue="PRODLGU">
+					 PROD.PROD_LGU LIKE '%' || #search_keyword# || '%'
+				</isEqual>
+				<isEqual property="search_keycode" compareValue="PRODNAME">
+					 PROD.PROD_NAME LIKE '%' || #search_keyword# || '%'
+				</isEqual>
+				<isEqual property="search_keycode" compareValue="BUYERNAME">
+					 BUYER.BUYER_NAME LIKE '%' || #search_keyword# || '%' 
+				</isEqual>
+			</isNotEmpty>
+		</dynamic>
+		
+	</sql>
+	
+
+
+	
+	<select id="prodList" resultClass="prodVO" parameterClass="map">
+	SELECT B.*
+	FROM
+		(SELECT ROWNUM RNUM, A.*
+		FROM(
+			<include refid="selectAll"/>
+			<include refid="searchCondition"/>)A)B
+	<![CDATA[				 	
+	WHERE B.RNUM <= #startCount#
+		AND B.RNUM >= #endCount#
+	]]>
+		
+	</select>
+	
+	
+	<update id="prodUpdate" parameterClass="prodVO"> 
+		UPDATE PROD
+			SET PROD_COST = #prod_cost#
+			   ,PROD_PRICE = #prod_price#
+			   ,PROD_SALE     = #prod_sale#
+			   ,PROD_OUTLINE = #prod_outline#
+			   ,PROD_DETAIL = #prod_detail#
+			   ,PROD_QTYIN = #prod_qtyin#
+			   ,PROD_TOTALSTOCK = #prod_totalstock#
+			   ,PROD_INSDATE= #prod_insdate#
+			   ,PROD_PROPERSTOCK = #prod_properstock#
+		 WHERE PROD_ID = #prod_id#
+	</update>
+	
+	<insert id="prodInsert" parameterClass="prodVO">
+		INSERT INTO PROD (	 
+						 PROD_ID,      	  
+						 PROD_NAME,       
+						 PROD_LGU,        
+						 PROD_BUYER,      
+						 PROD_COST,   
+						 PROD_PRICE,  
+						 PROD_SALE,        
+						 PROD_OUTLINE,
+ 						 PROD_DETAIL,
+						 PROD_QTYIN,
+						 PROD_TOTALSTOCK,
+						 PROD_INSDATE,   
+						 PROD_PROPERSTOCK
+						 ) 
+					 VALUES(
+						 #prod_id#,
+						 #prod_name#,
+						 #prod_lgu#,
+						 #prod_buyer#,
+						 #prod_cost#,
+						 #prod_price#,
+						 #prod_sale#,
+						 #prod_outline#,
+ 						 #prod_detail#,
+						 #prod_qtyin#,
+						 #prod_totalstock#,
+						 #prod_insdate#,
+						 #prod_properstock#
+				 	)
+	</insert>
+	
+	<select id="prodInfo" parameterClass="map" resultClass="prodVO">
+		SELECT *
+			FROM prod
+		 WHERE PROD_ID = #prod_id# 
+	</select>
+	
+	<update id="prodDelete" parameterClass="map" >
+		UPDATE PROD
+			SET PROD_DELETE = 'y' 
+		 WHERE PROD_ID = #prod_id#
+	</update>
+	
+	
+	<select id="prodIDDeduplicateList" resultClass="prodVO">
+		SELECT *
+		 FROM PROD 
+	</select>
+	
+	<select id="totalCount" parameterClass="map" resultClass="String">
+			SELECT COUNT(*)
+FROM (
+        SELECT A.*
+        FROM (SELECT * 
+              FROM PROD JOIN BUYER ON (PROD.PROD_BUYER = BUYER.BUYER_ID)
+              WHERE PROD_DELETE = 'n'
+              <include refid="searchCondition"/>) A)
+	</select>
+
+	
+
+	
+	
+</sqlMap>
+
+
+
+
+

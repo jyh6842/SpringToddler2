@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee https://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+	
+	<welcome-file-list>
+		<welcome-file>/WEB-INF/views/user/welcome.jsp</welcome-file>
+	</welcome-file-list>
+
+	<!-- 
+		서블릿 컨텍스트(DispatcherServlet) : 클라이언트의 요청을 처리하기 위해 선언된 DispatcherServlet.를 의미
+										 WebApplicationContext가 할당 (1개 당 1개 할당 됨)
+		루트 컨텍스트 : 서로 상이한 서블릿 컨텍스트 간에 공유되어야하는 설정 및 자원의 공유를 위해 선언    <- 서블릿 컨텍스트는 한개당 하나의 공간이 할당되는데 공유가 안되서
+					WebApplicationContext 할당
+					
+							루트 컨텍스트(WebApplicationContext)
+							설정파일 : contextLoaderListener
+							다른 서블릿 컨텍스트 간에 활용될 공유 설정과 공유 자원 활용을 위해서
+							* 루트 컨텍스트를 생성하기 위한 설정파일 내 선언된 빈들의 인스턴스
+							   시점은 서버 실행시 ServletContext 생성 직후 
+							  WebApplicationContext와 동반 인스턴스화 됨
+											|
+					==============================================================================================
+					|													|										 |
+				서블릿 컨텍스트(firstDispatcher)						서블릿 컨텍스트(secondDispatcher)					서블릿 컨텍스트
+					WebApplicationContext 할당					WebApplicationContext 할당						WebApplicationContext 할당
+					설정 파일 : firstDispatcher-servlet.xml			설정 파일 : secondDispatcher-servlet.xml			설정파일 : servlet-*.xml
+					* 클라리언트 요청시에 설정파일 내 선언된 빈의				* 클라리언트 요청시에 설정파일 내 선언된 빈의					* 클라이언트 요청시 설정파일 내 성언된 빈의
+					  인스턴스화가 진행됨.								  인스턴스화가 진행됨.										인스턴스화가 진행됨.
+	 -->
+	<!-- 상수 선언 -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath:kr/or/ddit/spring/config/application-*.xml</param-value> <!-- application-*.xml application- 으로 시작하고 xml로 끝나는 모든것이 와도 된다. -->
+	</context-param>
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class> <!-- 서버가 돌자마자 서블릿 컨텍스트가 배포되면? -->
+	</listener>
+	
+	
+	
+	<!-- 
+		스프링 프레임웤이 적용된 웹 애플리케이션 내에서 클라이언트의
+		요청을 처리하는 프론트 컨트롤러 선언
+		
+		1. 스프링 프레임웤의 프론트 컨트롤러 선언시 설정파일이 필요
+			1. default
+				WEB-INF/servlet-name의 텍스트 값 + '-servlet.xml' 
+					ex) WEB-INF/firstDispatcher-servlet.xml <= 이러한 이름으로 되어야 함
+			
+			2. 프론트 컨트롤러(DispatcherServlet) - WebApplicationContext 생성 할당
+											      다수의 WebApplicationContext는 공유가 안된다. 어디에서 사용이 안됨?
+			
+	 -->
+	 
+	 <servlet>
+	 	<servlet-name>firstDispatcher</servlet-name>
+	 	<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class> <!-- 클라이언트의 요청을 처리하는 프론트 컨트롤러인 클래스 가장 처음으로 요청을 받음 -->
+	 </servlet>
+	 <servlet-mapping>
+	 	<servlet-name>firstDispatcher</servlet-name>
+	 	<url-pattern>*.first</url-pattern>
+	 </servlet-mapping>
+	 
+	 
+	 <servlet>
+	 	<servlet-name>secondDispatcher</servlet-name>
+	 	<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class> <!-- 클라이언트의 요청을 처리하는 프론트 컨트롤러인 클래스 가장 처음으로 요청을 받음 -->
+	 </servlet>
+	 <servlet-mapping>
+	 	<servlet-name>secondDispatcher</servlet-name>
+	 	<url-pattern>*.second</url-pattern>
+	 </servlet-mapping>
+	 
+	 <servlet>
+	 	<servlet-name>doDispatcher</servlet-name>
+	 	<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+	 	<init-param>
+	 		<param-name>contextConfigLocation</param-name>
+	 		<param-value>/WEB-INF/spring/config/servlet-*.xml</param-value>
+	 	</init-param>
+	 </servlet>
+	 <servlet-mapping>
+	 	<servlet-name>doDispatcher</servlet-name>
+	 	<url-pattern>*.do</url-pattern>
+	 </servlet-mapping>
+	 
+	 <!-- 
+	 		forceEncoding : true - 클라이언트가 서버대상 요청시 HttpServletRequest.getCharacterEncoding() 취득시 다른 인코딩 타입으로 선언되어 있더라도 해당 취득 인코딩 타입을 적용
+	 							       클라이언트가 서버대상 요청시 HttpServletRequest.getCharacterEncoding() 미취득시 선언된 인코딩 타입이 적용
+	 						false - 클라이언트가 서버대상 요청시 HttpServletReuquest.getCharacterEncoding()취득시에도 선언된 인코딩 타입이 강제 적용
+	  -->
+	 <filter>
+	 	<filter-name>encodingFilter</filter-name>
+	 	<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+	 	<init-param>
+	 		<param-name>encoding</param-name>
+	 		<param-value>UTF-8</param-value>
+	 	</init-param>
+	 	<init-param>
+	 		<param-name>forceEncoding</param-name>
+	 		<param-value>true</param-value>
+	 	</init-param>
+	 </filter>
+	 <filter-mapping>
+	 	<filter-name>encodingFilter</filter-name>
+	 	<url-pattern>*.do</url-pattern>
+	 </filter-mapping>
+	 
+
+</web-app>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN"
+       "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+<tiles-definitions>
+	<!-- 
+		타일즈 설정 파일 반드시 한개 이상의  defintion이 선언되어 있어야 한다.
+		
+		definition : 단위 레이아웃
+					  상속 가능
+					 name - 유일값으로 definition의 구분을 위한 구분자.
+					 		TilesDispatchServlet으로부터 TilesServlet이 취득한
+					 		문자열과 매핑되는 기준이다.
+					 template - 레이아웃 구성
+					 			attribute에 선언된 View를 활용해서 레이아웃을 구성.ㄴ
+					 put-attribute - 단위 View(jsp)
+	 -->
+	 
+	 <definition name="user/main" template="/WEB-INF/views/user/mainTemplate.jsp">
+	 	<put-attribute name="title" value="엄마 !!미안해!!"></put-attribute>
+	 	<put-attribute name="header" value="/WEB-INF/views/user/layout/header.jsp"></put-attribute>
+	 	<put-attribute name="left" value="/WEB-INF/views/user/layout/left.jsp"></put-attribute>
+	 	<put-attribute name="content_header" value="/WEB-INF/views/user/content_header.jsp"></put-attribute>
+	 	<put-attribute name="footer" value="/WEB-INF/views/user/layout/footer.jsp"></put-attribute>
+	 </definition>
+	 
+	 
+	 <!-- 커맨드 컨트롤러  implements IAction{
+	 		public String process(request, response){
+	 			return "/user/freeboard/freeboardList.tiles";
+	 							{1}         {2}
+	 		}
+	 	}
+	  -->
+	<definition name="user/*/*" extends="user/main"> <!-- user/freeboard/freeboardList -->
+		<put-attribute name="content" value="/WEB-INF/views/user/{1}/{2}.jsp"></put-attribute>
+	</definition>
+	<!-- <definition name="user/freeboard/freeboardList" extends="user/main">
+		<put-attribute name="content" value="/WEB-INF/views/user/freeboard/freeboardList.jsp"></put-attribute>
+	</definition>
+	<definition name="user/freeboard/freeboardForm" extends="user/main">
+		<put-attribute name="content" value="/WEB-INF/views/user/freeboard/freeboardForm.jsp"></put-attribute>
+	</definition> -->
+ <!-- web.xml에 일치하는게 잇으면 단위 레이아웃으로 바뀌어서 쓴다? --> <!-- 위에 네임이 user/main 인거 상속 받음 -->
+	 
+	
+</tiles-definitions>

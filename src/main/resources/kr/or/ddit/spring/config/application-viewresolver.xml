@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
+
+	<!-- 
+		public class InternalResourceViewResolver{
+			private String prefix;
+			private String suffix;
+			public void setPrefix(String prefix){
+				this.prefix = prefix;
+			}
+			public void setSuffix(String suffix){
+				this.suffix = suffix;
+			}
+		}	
+	 -->
+	<bean name="jspViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+		p:prefix="/WEB-INF/views/"
+		p:suffix=".jsp"
+		p:order="3"> <!-- 우선순위 정해 줄려고 -->
+<!-- 	 	<property name="prefix" value="/WEB-INF/views/"></property> -->
+<!-- 	 	<property name="suffix" value=".jsp"></property> -->
+	 </bean>
+	 
+	 <!-- 
+	 	컨트롤러 메서드 반환값이 AbstractView를 상속받은 view 클래스의 
+	 	빈 등록시의 id 또는 name 속성값일때 해당 View 클래스에 접근
+	  -->
+	 <bean name="beanNameViewResolver" class="org.springframework.web.servlet.view.BeanNameViewResolver"
+	 	p:order="2"
+	 ></bean>
+	 
+	 <bean name="tilesViewResolver" class="org.springframework.web.servlet.view.UrlBasedViewResolver"
+	 	p:viewClass="org.springframework.web.servlet.view.tiles2.TilesView"
+	 	p:order="1"
+	 ></bean>
+	 
+	 
+	 
+<!-- 	 c:mem_id="a001" 는 생성자에 주입할 때, property은 값을 넣어줄때? -->
+<!-- 	 <bean id="memberInfo" name="m1 m2 m3" class="kr.or.ddit.vo.MemberVO" -->
+<!-- 	 	c:mem_id="a001" c:mem_pass="asdfasdf" c:mem_name="김은대" -->
+<!-- 	 	p:mem_regno1="111111" p:mem_regno2="1111118"> -->
+<!-- 	 생성자의 파라미터 순서와 동일, name 속성이 없으면 순서대로 주입, name 속성에 생성자의 파라미터의 변수명을 주면 순서가 섞여도 됨 -->
+<!-- 		인덱스를 통해서도 name 처럼 파라미터 순서를 바로 잡을 수 있음 -->
+
+<!-- 	 	<constructor-arg value="asdfasdf" name="mem_pass"></constructor-arg> -->
+<!-- 	 	<constructor-arg value="a001" name="mem_id"></constructor-arg> -->
+
+<!-- 	 	<constructor-arg value="asdfasdf" index="1"></constructor-arg> -->
+<!-- 	 	<constructor-arg value="a001" index="0"></constructor-arg> -->
+<!-- 	 	<constructor-arg value="김은대" index="2"></constructor-arg> -->
+
+		<!-- 이거 세터임? --> <!-- property - 해당 빈 전역변수의 setter를 대상으로 주입값 선언 -->
+<!-- 		<property name="mem_regno1" value="111111"></property> -->
+<!-- 		<property name="mem_regno2" value="1111118"></property> -->
+<!-- 		property 대신에 p 태그를 이용하여 같은 효과를 낼 수 있음 namespace에 등록해야 p 태그를 사용할 수 있음 -->
+
+
+<!-- 	 </bean> -->
+</beans>

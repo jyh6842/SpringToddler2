@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
+
+	<!-- 
+		스프링 프레임웤 IoC(Inversion of Control : 역제어)
+			1. 스프링 프레임웤이 관리하는 빈들의 인스턴스화 및 제공처 대상
+				인스턴스를 제공하기 위한 스프링 프레임웤의 핵심 기능
+			2. 구분
+				DL(Dependency Lookup) : 설정 파일 내 선언된 빈이 해당 위치에 해당 이름으로 존재 여부를 검증
+				DI(Dependency Injection(주입, 제공)) : 설정파일 내 선언된 빈의 인스턴스를 제공처에 제공 
+	
+		커맨드 컨트롤러 : 클라이언트의 요청을 실제 처리하는 자원
+				   자격 조건 - 설정파일 내 빈 등록 완료 되어 있어야 한다.
+				   		 해당 자원(커맨드 컨트롤러 클래스) 클래스 선언 상단부에 @Controller 선언 완료.
+				   		 하나라도 하니면 커맨드 컨트롤러가 아니다.
+		
+		컨트롤러 메서드 : 클라이언트의 요청을 실제 처리하는 비지니스 로직을 포함하는 콜백 메서드
+			반환 타입 : void - 클라이언트 요청시 서블릿 패스를 기준으로 뷰리솔버에 전달될 값이 추출 활용(알아서 추출 된다?)
+					String - View를 결정하기 위한 문자열을 뷰리솔버에 전달
+					Model - 클라이언트 요청시 서블릿 패스를 기준으로 viewResolver에 전달될 값이 추출 활용
+							뷰 대상 전달될 데이타를 설정하고 포워딩 처리를 통해 전달(인터페이스)
+					ModelMap - 클라이언트 요청시 서블릿 패스를 기준으로 viewResolver에 전달될 값이 추출 활용
+							뷰 대상 전달될 데이타를 설정하고 포워딩 처리를 통해 전달(인터페이스 Model의 구현 클래스)
+					ModelAndView - 뷰 대상 전달될 데이터 설정 및 뷰의 패스와 명을 설정(그 외 redirect 또는 forward 가능)
+					@ModelAttribute("View에서 EL 접근을 위한 키") - 컨트롤러 메서드의 반환값(VO)로 선언하고, 컨트롤러 메서드에 해당 VO가 파라메터 선언시
+															  해당 VO를 Model.addAttribtue("키", VO) 자동 설정 처리		
+			파라미터 타입 : 지역변수 - 클라이언트로부터 전송되는 쿼리스트링의 키와 일치하는 변수명
+                           HTTPServletRequest - DI
+                           HTTPServletResponse - DI
+                           HTTPSession - DI
+                           MAP - DI => BindingAwaureModelMap으로 리턴되지만 Map을 implement 받기 때문에 Map처럼 사용할수있다.
+                           Model - DI
+                           
+        					@RequestParam - value = 클라이언트 요청시 쿼리스트링의 키와 주입 대상 파라미터명이 상이할때 활용
+        									required = 필수 주입
+        												default true - 주입이 불가능한 경우 에러
+        												false - 주입 값이 존재하지 않아도 에러 미발생
+        														주입값 존재시 주입 처리
+        												defaultValue - 주입값이 존재하지 않을때 파라미터 대상 널 대체 주입값 설정
+        					@PathVariable - 클라이언트 요청시 서블릿 패스 내 의미있는 값을 취득
+        					
+        					@RequestHeader - 클라이언트 요청시 요청 헤더의 큭정 키를 통해 요청 요청 헤더의 값을 취득
+        					@RequestHeader - 클라이언트 요청시 헤더의 특정 키를 통해 요청 헤더의 값을 취득 
+                     		@CookieValue - 클라이언트 요청시 전송되는 특정 쿠키의 키를통해 쿠키의 값을 취득
+        												
+
+	
+		bean : id - 다른 빈과 구분을 위해 선언된 구분자(유니크) 같은 아이디가 또 선언되면 안됨
+			   name - 1. 단독선언시 id 속성과 동일한 의미가 부여 => 구분을 위해 선언된 구분자(유니크) 이런 말임
+			   		  2. id 속성과 동반 선언되면 해당 id의 별명으로 활용
+			   class - 해당 자원이 배치된 패키지명과 자원명
+			   scope - default
+			   			설정 파일 내 선언된 빈의 인스턴스는 싱글톤 패턴을 적용해 관리되고 제공.
+			   constructor-arg : 해당 빈의 생성자 대상 주입값을 선언할 때 사용
+			   					 주입 순서 = default 선언 순서
+			   					 		 name 속성을 활용해 특정 생성자의 특정 파라메터 선언명 맵핑 가능
+			   					 		 index 속성을 활용한 생성자에 선언된 파라메터 선언 순서 맵핑 가능
+			   					 		 ref(reference) 속성을 활용해 성정파일 내 선언된 다른 빈(id 속성값 또는 name 속성값)의 인스턴스를 주입
+			   					 네임스페이스 c로 활용 가능 
+			   	property - 해당 빈 전역변수의 setter를 대상으로 주입값 선언
+		
+		어노테이션 : @RequestMapping - 클라이언트 요청시 서블릿 패스와 해당 요청을 처리하는 메서드(컨트롤러 메서드)와의 맵핑 조건
+				 context:component-scan 선언으로 활용
+					 @Controller - 커맨드 컨트롤러 자격 부여 조건.
+					 @Controller - 컨트롤러 클래스 상단 선언으로 해당 클래스의 자동 빈 등록 처리
+					 @Service - Service 레이어의 클래스 상단 선언으로 해당 클래스의 자동 빈 등록 처리
+					 @Repository - DAO 레이어의 클래스 상단 선언으로 해당 클래스의 자동 빈 등록 처리
+					 @Component - 기타 클래스 상단 선언으로 해당 클래스의 자동 빈 등록 처리
+					 * 사용 가능 어노테이션 추카
+					 	- JSR-250 스펙(JDK6버전부터 포함)
+					 		@Required - setter 대상 필수 값 주입 선언(setter 상단 선언)
+					 		@Value - 전역변수 상단 선언으로 properties 파일의 값을 주입
+					 		@PreDestory - 빈 클래스가 GC되기 직전에 콜백되어야하는 메서드 상단 선언
+					 		@Constructor - 빈 클래스 인스턴스화된 직후 콜백되어야하는 메서드 상단 선언
+					 		@Resource - IoC DI(Dependency Injection) 수행
+					 				  	선언 가능 영역 : 전역변수, 메서드 상단에 선언
+					 				  	빈 클래스와 인스턴스 주입 기준 : 타입을 기준으로 주입 처리
+					- JSR-330 스펙 (JDK7 버전부터 포함)
+						@Inject - import java-inject-?.?.?jar가 요구됨
+								  IoC DI(Dependency Injection) 수행
+								    선언 가능 영역 : 전역변수, 생성자 메서드 상단에 선언
+								    빈 클래스의 인스턴스 주입 기준 : 빈의 타입을 기준으로 주입 처리
+					- 스프링 프레임웤
+						@Autowired - IoC DI(Dependency Injection) 수행
+									 선언 가능 영역 : 전역변수, 생성자 메서드 상단에 선언
+									 빈 클래스의 인스턴스 주입 기준 : 빈의 타입을 기준으로 주입 처리
+					    @Qualifier - @Autowired와 동반 선언될 수 있음.
+					    			타입이 중복되는 빈 클래스의 인스턴스 주입시 주입 대상 빈의 빈등록시 id 또는 name 속성값을 기준으로 주입 처리
+					    				
+					    			ex) @Service
+					    				class IMemberServiceImpl implements IMemberService extends IService() 이렇게 만들어 졌다고 치면
+					    				@Service
+					    				class IFreeboardServiceImpl implements IFreeboardService extends IService()
+					    				
+					    				@Component
+					    				class A {
+					    					@Autowired 이거 쓰면 에러남 왜냐하면 extends IService() 둘다 이거 받아서 어떤거 받아야 할지 몰라서
+					    					이때 
+					    					@Qualifier('iMemberServiceImpl') 이거 사용하는 것임 
+					    					private IService service;
+					    				}
+					  
+				 	   
+	 -->
+<!-- 	 <bean name="jspViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver"> -->
+<!-- 	 	<property name="prefix" value="/WEB-INF/views/user/"></property> -->
+<!-- 	 	<property name="suffix" value=".jsp"></property> -->
+<!-- 	 </bean> -->
+	 
+	 
+<!-- 	<bean id="firstController" class="kr.or.ddit.first.controller.FirstController"></bean> -->
+	
+<!-- 	<bean id="memberInfo" name="m1 m2 m3" class="kr.or.ddit.vo.MemberVO"></bean> -->
+</beans>

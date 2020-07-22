@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- 
+		@RequestBody		- 클라이언트 서버 대상 요청시 전송되는 전체 쿼리스트링을 문자열 형태로 취득
+								ex) mem_id=a001&mem_pass=asdfasdf&mem_name=8932479234
+		@ResponseBody		- 컨트롤러 메서드의 반환값을 ViewResolver 대상 전달하지 않으며, 직접 클라이언트(브라우저, ajax 엔진)에 전송
+		RedirectAttribute	- 컨트롤러 메서드에서 다른 컨트롤러 메서드의 리다이렉트 응답제어에 따른 호출시 전달될 값을 post 전송인것처럼 전송처리
+	 -->
+	 
+<!-- 	 위에 3개 쓰려고 mvc:annotation-driven 선언해주는 것임. 이거 없으면 주입이 안됨-->
+	 <mvc:annotation-driven></mvc:annotation-driven>
+
+</beans>

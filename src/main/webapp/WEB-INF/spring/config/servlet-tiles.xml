@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="tilesConfigurer" class="org.springframework.web.servlet.view.tiles2.TilesConfigurer"> <!-- tiles2버전임 -->
+		<property name="definitions">
+			<list>
+				<value>/WEB-INF/views/tiles/tiles-*.xml</value> <!-- 0번째 인덱스 값 -->
+			</list>
+		</property>
+	</bean>
+</beans>

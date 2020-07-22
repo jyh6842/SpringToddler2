@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd">
+		<!-- 
+		스프링 프레임 웤 내 트랜잭션 처리 설정 : aop(관점 지향 프로그래밍) 활용
+									어노테이션(@Transactional) 활용
+									
+														클라이언트					@(Transactional)활용
+																				트랜잭션 설정
+		TransactionManager 		DispatcherServlet		Controller				Service		DAO			DB
+								 							public 컨트롤러 메서드 => 메서드 =>		메서드	=> 질의(insert, update, del)
+								 							
+			Commit				<=						<=					<=				<=		<= 정상질의
+			Rollback			<=						<=					<=				<=		<= 에러 발생
+			
+			proxy-target-class : true = @Transactional이 상단에 선언된 Service Layer 내 클래스 메서드가 Interface를 구현하지 않을 경우(cglib 동적으로 해당 메섣의 프로토타입을 추출 자원 활용)
+								 false = @Transactional이 상단에 선언된 Service Layer 내 클래스 메서드가 Interface를 구현하지 않을 경우
+								 * DAO로 부터 익셉션이 서비스 레이어 대상 드로우 되면 발생된 익센션 정보와 @Transactional 설정 정보와
+								  @Transactional이 선언된 서비스 레이어의 해당 메서드 원형이 컨트롤러와 DispatcherServlet을 거쳐서 
+								     트랜잭션 매니저에 전달로 Commit과 Rollback 처리가 수행
+		 -->
+<!-- 	tx 트랜잭션 -->
+		<tx:annotation-driven transaction-manager="transactionMGR"/> <!-- application-ibatis.xml에 있는 것과 id와 동일 해야함 -->
+</beans>
