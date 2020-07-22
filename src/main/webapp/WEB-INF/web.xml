@@ -107,5 +107,15 @@
 	 	<url-pattern>*.do</url-pattern>
 	 </filter-mapping>
 	 
+<!-- 	 로그 찍어주는 것을 logback 으로 대체한다. AOP(관점 지향) log4j 이제 필요 없다. -->
+	 <context-param>
+	 	<param-name>logbackConfigLocation</param-name>
+	 	<param-value>classpath:kr/or/ddit/logback/config/logback.xml</param-value>
+	 </context-param>
+	 <!-- 리스너로 등록 해서 logback 사용 -->
+	 <listener>
+	 	<listener-class>ch.qos.logback.ext.spring.web.LogbackConfigListener</listener-class>
+	 </listener>
+	 
 
 </web-app>

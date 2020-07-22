@@ -1,0 +1,105 @@
+1. AOP(Aspect Oriented Programming) - 관점지향프로그래밍
+  - 변경하지 않거나 미미한 변경사항이 적용되어 다수의 클래스에 반복적으로 활용되는 코드를
+     보일러판 코드라고 함.
+  - 다수의 클래스에 반복적으로 활용(로그찍는 코드, 트랜잭션 관리 코드 등)되는 코드를 모듈(독립성을 가진 동작단위)화
+     시키고, [컴파일시|로딩시|생성시|함수호출시|전역변수 값설정/취득시]의 시점에 모듈 주입을 통해 구현
+  - 독립 모듈로 구현된 코드 베이스를 대상으로한 수정으로 다수의 클래스에 수정 코드 시멘틱(코드의 의미있는 동작)이 적용됨.    
+  - 관련 키워드
+    Advice : 언제. 무엇을. 어떤 공통모듈을 어떤 시점(컴파일시|로딩시|생성시|함수호출시|전역변수 값설정/취득시)에 
+                  어디에 주입할것인지를 결정함.
+    JoinPoint : 어디에. 공통모듈을 어디에 주입할것인지를 결정함. - 원래 공통코드를 가지고 있었던 장소
+    PointCut : JoinPoint들의 팩키지. - 중복코드들을 가지고 있었던 것들을 묶어서 JoinPoint를 묶어서
+    Weaving : Advice를 PointCut에 주입시키는 행위.
+    Aspect : 공통모듈 - 중복코드가 분리 된것
+
+2. eclipse AJDT(The AspectJ Development Tools)의 활용
+  - 설치
+    가) Help -> Eclipse Marketplace -> 검색 키워드 AJDT -> eclipse 버젼별 install
+      * 버젼에 맞게 설치해야됨.
+    나) Luna 버젼 - help -> install new software
+                        http://download.eclipse.org/tools/ajdt/43/dev/update/
+  
+  - 툴의 활용
+      1) 기존 프로젝트 -> 오른쪽 마우스 버튼 클릭 -> Configure -> 
+         Convert to AspectJ Project 선택으로 해당 프로젝트에 AJDT 적용
+      2) 생성 마법사 창 -> AspectJ -> Aspect 선택으로 확장자 aj 파일을 생성
+         (aj 파일내 작성된 advice 옆 화살표의 오른쪽 마우스 버튼 클릭 -> Advises로 적용될 joinpoint에 접근 가능.)
+            
+      3) Cross References 뷰에서는 작성된 aspect가 advice를통해 weaving될 pointcut내
+         joinpoint가 출력됨.
+        
+      4) Window -> Show View -> other -> Visualiser 뷰를 통해 핵심관심, 종단관심을 시각적으로 출력
+  
+  - aspectj의 활용
+      1. aspectj의 표현식 함수
+     
+        1.1 execution() - PointCut 표현식 정의(pointcut 설정된 위빙 대상을 런타임시 감지해 동작)
+        1.2 call() - PointCut 표현식 정의(미리 pointcut 설정된 위빙 대상을 stack frame에 저장하고 동작)
+        1.3 within(팩키지명 또는 인터페이스 또는 클래스) - 타입을 기준으로  팩키지명 또는 인터페이스 또는 클래스 내의 
+                                                               모든 메서드를 pointcut으로 설정 
+        1.4 this(kr.or.ddit.serviec.member.IMemberService) - 팩키지 내 또는 하위 팩키지의
+                   IMemberService 인터페이스를 구현하는 프록시 개체의 모든 메서드를 pointcut으로 설정 
+        1.5 target(kr.or.ddit.serviec.member.IMemberService) - .IMemberService 인터페이스를
+                            구현하는 모든 객체의 모든 메서드를 pointcut으로 설정 
+        1.6 args(전달값의 이름 또는 타입) - execution or this or target과 &&의 결합으로 같이 선언됨
+        
+      2. pointcut 정의 - weaving 대상의 팩키지 또는 다수의 팩키지들 | 클래스 또는 클래스들 | 함수 또는 함수들을 대상으로 설정
+                       (aspectj의 pointcut 표현식을 활용하거나, 정규식 패턴을 활용함)
+         2.1 execution(접근지정자[생략가능] 반환타입[Wrapper형태,생략가능] 팩키지[생략가능].클래스[생략가능].함수명[생략가능](파라메터1,...[Wrapper or wildcard형태])
+            2.1.1 예제
+				- execution(public MemberBean kr.or.ddit.service.IMemberServiceImpl.getMemberInfo(..))
+					public 접근지정자와 반환타입이 kr.or.ddit.service 팩키지내 IMemberServiceImpl 클래스의 파라메터가 0개이상인 
+					getMemberInfo 호출
+					
+                - execution(public void *.*.set*(..))
+					접근지정자가 public이고 반환타입이 void이고 어떤 팩키지의 어떤 클래스에 포함되어져있어도 상관없으며,
+					메서드명이 set으로 시작하고, 파라미터가 0개 이상인 메서드 호출.
+				  	
+				- execution(* kr.or.ddit.service.*.*())
+					접근지정자와 반환타입에 관계없이 kr.or.ddit.service 패키지내 클래스명과 함수명에 관계없이 
+					파라미터가 없는 모든 메서드 호출.
+					 
+		        - execution(* kr.or.ddit.service..*.*(..))
+					접근지정자와 반환타입에 관계없이 kr.or.ddit.service 패키지 및 하위 패키지내 클래스명과 함수명에 관계없이 
+					파라미터가  0개 이상인 메서드 호출.
+				
+  				- execution(* get*(*))
+					접근지정자와 반환타입 및 팩키지와 클래스명에 관계없이 메서드명이 get으로 시작하고 파라메터 타입에 관계없이 1개의 파라미터를 갖는 메서드 호출.
+					
+				- execution(* get*(*, *))
+					접근지정자와 반환타입 및 팩키지와 클래스명에 관계없이 메서드명이 get으로 시작하고 파라메터 타입에 관계없이 2개의 파라미터를 갖는 메서드 호출.
+					
+				- execution(* read*(Integer, ..))
+					접근지정자와 반환타입 및 팩키지와 클래스명에 관계없이 메서드명이 read로 시작하고, 첫 번째 파라미터 타입이 Integer이며, 
+					1개 이상의 파라미터를 갖는 메서드 호출.
+					
+         2.2 within(메서드가 아닌 특정 타입[인터페이스, 클래스]에 속하는 모든 메서드를 Pointcut으로 설정할 때 활용
+            2.2.1 예제					
+			    - within(kr.or.ddit.service.IMemberService+)
+					   - kr.or.ddit.service 팩키지내 IMemberService 인터페이스의 모든 메서드 호출.
+					     (+ : 구현 클래스 또는 서브 클래스를 의미)
+					
+				- within(kr.or.ddit.service.*)
+					   - kr.or.ddit.service 팩키지내 모든 인터페이스 및 클래스에 포함된 모든 메서드 호출.
+					  
+				- within(kr.or.ddit..*)
+					   - kr.or.ddit 팩키지 또는 하위 팩키지내 모든 인터페이스 및 클래스에 포함된 모든 메서드 호출.
+					
+		 2.3 표현식 연결
+			각각의 표현식은 '&&' 나 '||' 연산자를 이용하여 연결 가능.
+			
+	     2.4 표현식의 부정(exclude) : !
+	     
+     3. advice 정의
+         3.1 before advice - joinpoint 활용 전 aspect의 weaving 처리
+         3.2 after advice - joinpoint 활용 후 aspect의 weaving 처리
+         3.3 after returning advice - joinpoint을 정상적으로 활용 후 반환값 반환이후  aspect의 weaving 처리
+         3.4 after throwing advice - joinpoint 활용시 익셉션 발생된 이후 aspect의 weaving 처리
+         3.5 around advice - before advice와 after returning advice가 합쳐져  aspect의 weaving 처리
+     
+  - 참고
+  	 http://www.eclipse.org/ajdt/demos/HelloWorldAspectJ.html
+  	 http://www.visualcplusdotnet.com/javaopensource/javaopaspectjeclipse.html
+     http://eclipse.org/aspectj/doc/released/runtime-api/index.html
+     http://www.eclipse.org/aspectj/sample-code.html
+     http://www.eclipse.org/aspectj/doc/next/progguide/semantics.html

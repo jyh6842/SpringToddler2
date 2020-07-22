@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 30초 간격 스캔 후 수정 사항 자동 반영 -->
+<configuration scan="true" scanPeriod="30 seconds">
+	<!-- property 는 상수 선언 한 것 LOG_HOME, LOG_PATTERN 이러한 이름 --> 
+	<!-- 똑같은 로그 내용이 들어오면? 예전에 읽었던것을 그대로 찍어 버려서 시간을 절약 버퍼가 있기 때문에 가능 log4j는 버퍼가 없다. -->
+	<property name="LOG_HOME" value="D:\\temp\\logback\\" />
+	<property name="LOG_PATTERN"
+		value="%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n" />
+
+	<!-- FILE 파일로 내보낼거야 -->
+	<appender name="FILE"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_HOME}\logback.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- 파일이름 패턴 -->
+			<fileNamePattern>${LOG_HOME}\logback.log.%d{yyyy-MM-dd}.log</fileNamePattern>
+			<!-- 파일 저장 기간 -->
+			<maxHistory>30</maxHistory>
+			<timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>100MB</maxFileSize> <!-- 100메가 채워지면 새로운 log파일 만듬 -->
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+		<encoder>
+			<pattern>${LOG_PATTERN}</pattern>
+		</encoder>
+	</appender>
+
+	<!-- STDOUT 콘솔로 내보낼거야 -->
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>
+				${LOG_PATTERN}
+			</pattern>
+		</encoder>
+	</appender>
+
+	<!-- 어떤걸 Log로 찍을 건지 logger로 추가하면 됨 -->
+	<logger name="java.sql.Connection" level="DEBUG" additivity="false">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="FILE" />
+	</logger>
+	<logger name="java.sql.ResultSet" level="DEBUG" additivity="false">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="FILE" />
+	</logger>
+	<!-- com.ibatis 처럼 공통 패키지만도 쓸수 있다. -->
+	<logger name="com.ibatis" level="DEBUG" additivity="false">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="FILE" />
+	</logger>
+	<logger name="java.sql.Statement" level="DEBUG" additivity="false">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="FILE" />
+	</logger>
+	<logger name="java.sql.PreparedStatement" level="DEBUG" additivity="false">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="FILE" />
+	</logger>
+	<logger name="kr.or.ddit" level="DEBUG" additivity="false">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="FILE" />
+	</logger>
+	
+	<!-- 스프링에서 주는 log 찍기 --> <!-- additivity 로그 찍을때 똑같은 로그가 중복되는거 출력되지 말라고 -->
+	<logger name="org.springframework" level="ERROR" additivity="false">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="FILE" />
+	</logger>
+
+	<root level="DEBUG">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="FILE" />
+	</root>
+</configuration>
+
+
+
+
+
+
+
+
