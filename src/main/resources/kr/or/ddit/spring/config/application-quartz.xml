@@ -27,7 +27,7 @@
 				<ref bean="timeCheckTrigger"/>
 			</list>
 		</property>
-<!-- 		<property name="autoStartup" value="false"></property> --> <!-- 내가 시작하세요 할때 시작 함 value="false" -->
+		<property name="autoStartup" value="false"></property> <!-- 내가 시작하세요 할때 시작 함 value="false" -->
 	</bean>
 
 </beans>

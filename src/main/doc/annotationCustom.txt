@@ -57,9 +57,19 @@
 	   public @interface PlaceSampleAnnotation {
 	   }
    
+   @Controller(value="자동 빈 등록시 빈명") 'value=' 은 생략 가능
    2.4 @StringValueAnnotation을 클래스 내 전역변수에만 설정 가능하도록 정의하고
           해당 어노테이션 설정시 문자열값을 설정하도록 하고, 해당 어노테이션의 취득은
           실행시 취득 활용되도록 정의 
+          
+     @RequestParam(value="mem_id", requried=false)
+     
+     @Target(ElementType=Parameter)
+     @Retention(RetentionPolicy.RUNTIME)
+     public @interface RequestParam{
+     	public String value();
+     	public boolean required(){return true;}
+     }
    
        @Target(ElementType.FIELD)
        @Retention(RetentionPolicy.RUNTIME)

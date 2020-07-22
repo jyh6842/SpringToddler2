@@ -17,9 +17,9 @@ public class IFreeBoardDaoImpl implements IFreeBoardDao {
 	@Autowired
 	private SqlMapClient client;
 
-	private IFreeBoardDaoImpl() {
-		client = SqlMapClientFactory.getSqlMapClient();
-	}
+//	private IFreeBoardDaoImpl() {
+//		client = SqlMapClientFactory.getSqlMapClient();
+//	}
 
 	@Override
 	public List<FreeboardVO> freeboardList(Map<String, String> params)

@@ -1,6 +1,5 @@
 package kr.or.ddit.join.controller;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Locale;
@@ -10,16 +9,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import kr.or.ddit.aop.Loggable;
 import kr.or.ddit.member.service.IMemberService;
 import kr.or.ddit.utiles.CryptoGenerator;
 import kr.or.ddit.vo.MemberVO;
 
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.support.RequestContextUtils;
 
 // /SpringToddler/user/join/loginForm.do
 // /SpringToddler/user/join/loginCheck.do
@@ -31,6 +31,10 @@ public class JoinController {
 //	private Logger loger = LoggerFactory.getLogger(this.getClass()); logback를 사용하지 않으면 각각의 클래스 마다 이걸 선언해 줘야하고
 	// 로그를 찍을 시점(메소드) 안에 로그를 찍게 만들어줘야 한다.
 	// 정상적으로 시작 되었는지 정상적으로 끝났는지 익셉션 됬는지 일일이 전부 로그를 만들어 줘야한다. AOP를 사용하면 알아서 해준다.
+	
+//	@Loggable
+//	private Logger logger; // 이렇게 하면 Loggerinjector에서  @Loggable이라는 어노테이션이 달린걸 전부 빈으로 등록해준다.
+
 	@Autowired
 	private MessageSourceAccessor accessor; // 다국어 지원 모드를 위해서
 	
@@ -40,7 +44,8 @@ public class JoinController {
 	@Autowired
 	private CryptoGenerator cryptoGenerator;
 	
-	   @RequestMapping(value="loginCheck", method=RequestMethod.GET, params={"mem_id=a001"})
+//	   @RequestMapping(value="loginCheck", method=RequestMethod.GET, params={"mem_id=a001"})
+	   @RequestMapping(value="loginCheck", method=RequestMethod.GET)
 	   public String loginCheckHeader(String mem_id, String mem_pass, 
 	         HttpServletRequest request, 
 	         HttpSession session, 
